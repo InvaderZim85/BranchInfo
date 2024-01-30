@@ -45,18 +45,9 @@ public sealed class BranchEntry : ObservableObject
     }
 
     /// <summary>
-    /// Backing field for <see cref="Status"/>
-    /// </summary>
-    private string _status = string.Empty;
-
-    /// <summary>
     /// Gets or sets the status of the repository
     /// </summary>
-    public string Status
-    {
-        get => _status;
-        set => SetProperty(ref _status, value);
-    }
+    public string Status => DiffFiles.Count > 0 ? "Has changes" : "No changes since last commit";
 
     /// <summary>
     /// Backing field for <see cref="LastCommit"/>
@@ -70,6 +61,24 @@ public sealed class BranchEntry : ObservableObject
     {
         get => _lastCommit;
         set => SetProperty(ref _lastCommit, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="DiffFiles"/>
+    /// </summary>
+    private List<DiffFileEntry> _diffFiles = [];
+
+    /// <summary>
+    /// Gets or sets the list with the diff files
+    /// </summary>
+    public List<DiffFileEntry> DiffFiles
+    {
+        get => _diffFiles;
+        set
+        {
+            if (SetProperty(ref _diffFiles, value))
+                OnPropertyChanged(nameof(Status));
+        }
     }
 
     /// <summary>

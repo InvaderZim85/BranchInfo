@@ -81,12 +81,19 @@ internal partial class MainWindowViewModel : ViewModelBase
     private SettingsControlViewModel _settingsControlViewModel = new();
 
     /// <summary>
+    /// Gets or sets the value which indicates if the diff file window context menu is enabled
+    /// </summary>
+    [ObservableProperty]
+    private bool _contextMenuDiffFilesEnabled;
+
+    /// <summary>
     /// Occurs when the user selected another branch
     /// </summary>
     /// <param name="value">The selected branch</param>
     partial void OnSelectedBranchChanged(BranchEntry? value)
     {
         ButtonRemoveEnabled = value != null;
+        ContextMenuDiffFilesEnabled = value is { DiffFiles.Count: > 0 };
     }
 
     /// <summary>
@@ -302,5 +309,22 @@ internal partial class MainWindowViewModel : ViewModelBase
 
         var arguments = $"/n, /e, \"{SelectedBranch.RepoDirectory}\"";
         Process.Start("explorer.exe", arguments);
+    }
+
+    /// <summary>
+    /// Opens the diff file window
+    /// </summary>
+    [RelayCommand]
+    private void ShowDiffFiles()
+    {
+        if (SelectedBranch == null || SelectedBranch.DiffFiles.Count == 0)
+            return;
+
+        var diffFileWindow = new DiffFileWindow(SelectedBranch.DiffFiles)
+        {
+            Owner = Application.Current.MainWindow
+        };
+
+        diffFileWindow.ShowDialog();
     }
 }

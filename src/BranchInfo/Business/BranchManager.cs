@@ -2,6 +2,7 @@
 using LibGit2Sharp;
 using Newtonsoft.Json;
 using System.IO;
+using BranchInfo.Common;
 
 namespace BranchInfo.Business;
 
@@ -88,7 +89,6 @@ internal class BranchManager
     {
         if (!Directory.Exists(branch.GitDirectory))
         {
-            branch.Status = "undefined";
             branch.FriendlyName = "undefined";
             branch.LastCheck = DateTime.Now;
             return;
@@ -96,13 +96,43 @@ internal class BranchManager
 
         using var repo = new Repository(branch.GitDirectory);
 
-        var hasChanges = repo.Diff.Compare<TreeChanges>().Count > 0;
-        branch.Status = hasChanges ? "Has changes" : "No changes since last commit";
+        var changes = repo.Diff.Compare<TreeChanges>();
         branch.FriendlyName = repo.Head.FriendlyName;
+        branch.DiffFiles = GetDiffFiles(changes);
         branch.LastCheck = DateTime.Now;
+        
 
         // Get the last commit
         var lastCommit = repo.Commits.FirstOrDefault(); // Get the first entry (the entries are ordered descending)
         branch.LastCommit = lastCommit != null ? $"{lastCommit.Author.Name} - {lastCommit.Author.When:yyyy-MM-dd HH:mm:ss}" : "undefined";
+    }
+
+    /// <summary>
+    /// Gets the diff files
+    /// </summary>
+    /// <param name="changes">The changes</param>
+    /// <returns>The list with the diff files</returns>
+    private static List<DiffFileEntry> GetDiffFiles(TreeChanges? changes)
+    {
+        if (changes == null)
+            return [];
+
+        var result = new List<DiffFileEntry>();
+
+        result.AddRange(GetValues(changes.Added, DiffFileType.Added));
+        result.AddRange(GetValues(changes.Deleted, DiffFileType.Delete));
+        result.AddRange(GetValues(changes.Modified, DiffFileType.Modified));
+        result.AddRange(GetValues(changes.Conflicted, DiffFileType.Conflicted));
+        result.AddRange(GetValues(changes.Copied, DiffFileType.Copied));
+        result.AddRange(GetValues(changes.Renamed, DiffFileType.Renamed));
+        result.AddRange(GetValues(changes.TypeChanged, DiffFileType.TypeChanged));
+        result.AddRange(GetValues(changes.Unmodified, DiffFileType.Unmodified));
+
+        return result;
+
+        IEnumerable<DiffFileEntry> GetValues(IEnumerable<TreeEntryChanges> values, DiffFileType type)
+        {
+            return values.Select(s => new DiffFileEntry(s.Path, type));
+        }
     }
 }

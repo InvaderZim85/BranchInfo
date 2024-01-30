@@ -115,6 +115,10 @@
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Command="{Binding OpenFolderInFileExplorerCommand}" Header="Open folder in file explorer" />
+                    <MenuItem
+                        Command="{Binding ShowDiffFilesCommand}"
+                        Header="Show changes"
+                        IsEnabled="{Binding ContextMenuDiffFilesEnabled}" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
 
