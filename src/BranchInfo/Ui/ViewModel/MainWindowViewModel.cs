@@ -75,6 +75,12 @@ internal partial class MainWindowViewModel : ViewModelBase
     private string _lastCheckInfo = "Last check: /";
 
     /// <summary>
+    /// Gets or sets the settings control window view model
+    /// </summary>
+    [ObservableProperty] 
+    private SettingsControlViewModel _settingsControlViewModel = new();
+
+    /// <summary>
     /// Occurs when the user selected another branch
     /// </summary>
     /// <param name="value">The selected branch</param>
@@ -112,6 +118,34 @@ internal partial class MainWindowViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Init the view model
+    /// </summary>
+    public async void InitViewModel()
+    {
+        var controller = await ShowProgressAsync("Please wait", "Please wait while adding the branch...");
+
+        try
+        {
+            // Add the new branch
+            await _manager.LoadBranchListAsync();
+
+            _lastCheck = DateTime.Now;
+
+            SetWindowTitle();
+
+            SetBranchList();
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
+        }
+        finally
+        {
+            await controller.CloseAsync();
+        }
+    }
+
+    /// <summary>
     /// Loads the branch information
     /// </summary>
     [RelayCommand]
@@ -142,34 +176,6 @@ internal partial class MainWindowViewModel : ViewModelBase
             return;
 
         SelectedBranch = BranchList.FirstOrDefault(f => f.GitDirectory.Equals(preSelection.GitDirectory));
-    }
-
-    /// <summary>
-    /// Init the view model
-    /// </summary>
-    public async void InitViewModel()
-    {
-        var controller = await ShowProgressAsync("Please wait", "Please wait while adding the branch...");
-
-        try
-        {
-            // Add the new branch
-            await _manager.LoadBranchListAsync();
-
-            _lastCheck = DateTime.Now;
-
-            SetWindowTitle();
-
-            SetBranchList();
-        }
-        catch (Exception ex)
-        {
-            await ShowErrorAsync(ex, ErrorMessageType.Save);
-        }
-        finally
-        {
-            await controller.CloseAsync();
-        }
     }
 
     /// <summary>

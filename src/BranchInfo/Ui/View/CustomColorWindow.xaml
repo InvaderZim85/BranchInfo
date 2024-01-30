@@ -1,5 +1,5 @@
 ﻿<mah:MetroWindow
-    x:Class="BranchInfo.Ui.View.AddBranchDialogWindow"
+    x:Class="BranchInfo.Ui.View.CustomColorWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,25 +7,26 @@
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:BranchInfo.Ui.ViewModel"
-    Title="New entry"
-    Width="600"
-    Height="150"
+    Title="Custom color"
+    Width="400"
+    Height="170"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     BorderThickness="1"
-    Loaded="AddBranchDialogWindow_OnLoaded"
+    IsMaxRestoreButtonEnabled="False"
+    IsMinButtonEnabled="False"
+    Loaded="CustomColorWindow_OnLoaded"
     ResizeMode="NoResize"
-    ShowMaxRestoreButton="False"
-    ShowMinButton="False"
     TitleCharacterCasing="Normal"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
     <Window.DataContext>
-        <viewModel:AddBranchDialogWindowViewModel />
+        <viewModel:CustomColorWindowViewModel />
     </Window.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -35,7 +36,6 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <Label
@@ -45,31 +45,36 @@
         <TextBox
             Grid.Row="0"
             Grid.Column="1"
-            Grid.ColumnSpan="2"
-            Text="{Binding RepoName}" />
+            Text="{Binding Name}" />
 
         <Label
             Grid.Row="1"
             Grid.Column="0"
-            Content="Path:" />
-        <TextBox
+            Content="Color:" />
+        <mah:ColorPicker
             Grid.Row="1"
             Grid.Column="1"
-            Text="{Binding GitDir}" />
-        <Button
-            Grid.Row="1"
-            Grid.Column="2"
-            Width="40"
-            Command="{Binding SelectDirectoryCommand}"
-            Content="..." />
-
-        <Separator
-            Grid.Row="2"
-            Grid.Column="0"
-            Grid.ColumnSpan="3" />
+            Margin="3"
+            DefaultColor="LimeGreen"
+            SelectedColor="{Binding SelectedColor}" />
 
         <Label
+            Grid.Row="2"
+            Grid.Column="0"
+            Content="Note:"
+            Style="{StaticResource ItemKey}" />
+
+        <TextBlock Grid.Row="2" Grid.Column="1">
+            Depending on the color selected, some texts / headings may no<LineBreak />
+            longer be clearly legible.</TextBlock>
+
+        <Separator
             Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="2" />
+
+        <Label
+            Grid.Row="4"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             HorizontalAlignment="Left"
@@ -77,18 +82,18 @@
             Foreground="Red" />
 
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="4"
             Grid.Column="0"
-            Grid.ColumnSpan="3"
+            Grid.ColumnSpan="2"
             FlowDirection="RightToLeft"
             Orientation="Horizontal">
             <Button
-                Width="75"
-                Command="{Binding CancelCommand}"
-                Content="Cancel" />
+                Width="60"
+                Command="{Binding CloseWindowCommand}"
+                Content="Close" />
             <Button
-                Width="75"
-                Command="{Binding AcceptValuesCommand}"
+                Width="60"
+                Command="{Binding SaveColorCommand}"
                 Content="Ok" />
         </StackPanel>
     </Grid>

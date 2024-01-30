@@ -38,34 +38,10 @@ internal partial class AddBranchDialogWindowViewModel : ViewModelBase
     private string _gitDir = string.Empty;
 
     /// <summary>
-    /// Gets or sets the error message
-    /// </summary>
-    [ObservableProperty]
-    private string _errorMessage = string.Empty;
-
-    /// <summary>
     /// Gets or sets the window title
     /// </summary>
     [ObservableProperty]
     private string _windowTitle = string.Empty;
-
-    /// <summary>
-    /// Occurs when the repo name was changed
-    /// </summary>
-    /// <param name="value">The new value</param>
-    partial void OnRepoNameChanged(string value)
-    {
-        ErrorMessage = string.Empty;
-    }
-
-    /// <summary>
-    /// Occurs when the git dir path was changed
-    /// </summary>
-    /// <param name="value">The new value</param>
-    partial void OnGitDirChanged(string value)
-    {
-        ErrorMessage = string.Empty;
-    }
 
     /// <summary>
     /// Init the view model
@@ -102,7 +78,7 @@ internal partial class AddBranchDialogWindowViewModel : ViewModelBase
 
         if (!dialog.FolderName.EndsWith(".git"))
         {
-            ErrorMessage = "You have to choose a '.git' folder!";
+            ShowInfoMessage("You have to choose a '.git' folder!");
             return;
         }
 
@@ -118,13 +94,13 @@ internal partial class AddBranchDialogWindowViewModel : ViewModelBase
     {
         if (string.IsNullOrEmpty(RepoName) || string.IsNullOrEmpty(GitDir))
         {
-            ErrorMessage = "Name and / or GIT directory are missing.";
+            ShowInfoMessage("Name and / or GIT directory are missing.");
             return;
         }
 
         if (_gitDirectories.Contains(GitDir, StringComparer.OrdinalIgnoreCase))
         {
-            ErrorMessage = "An entry with the specified path is already added.";
+            ShowInfoMessage("An entry with the specified path is already added.");
             return;
         }
 

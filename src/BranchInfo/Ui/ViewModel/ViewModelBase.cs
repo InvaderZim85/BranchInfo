@@ -1,16 +1,20 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MahApps.Metro.Controls.Dialogs;
+using Serilog;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using Serilog;
+using Timer = System.Timers.Timer;
 
 namespace BranchInfo.Ui.ViewModel;
 
 /// <summary>
 /// Provides the base functions of a view model
 /// </summary>
-internal class ViewModelBase : ObservableObject
+internal partial class ViewModelBase : ObservableObject
 {
+    /// <summary>
+    /// Provides the different error message types which can be used for the error message dialog
+    /// </summary>
     protected enum ErrorMessageType
     {
         /// <summary>
@@ -35,11 +39,28 @@ internal class ViewModelBase : ObservableObject
     private readonly IDialogCoordinator _dialogCoordinator;
 
     /// <summary>
+    /// The message timer
+    /// </summary>
+    private readonly Timer _messageTimer = new(TimeSpan.FromSeconds(10).TotalMilliseconds);
+
+    /// <summary>
+    /// Gets or sets the info message
+    /// </summary>
+    [ObservableProperty]
+    private string _infoMessage = string.Empty;
+
+    /// <summary>
     /// Creates a new instance of the <see cref="ViewModelBase"/>
     /// </summary>
     protected ViewModelBase()
     {
         _dialogCoordinator = DialogCoordinator.Instance;
+
+        _messageTimer.Elapsed += (_, _) =>
+        {
+            InfoMessage = string.Empty;
+            _messageTimer.Stop();
+        };
     }
 
     /// <summary>
@@ -135,5 +156,15 @@ internal class ViewModelBase : ObservableObject
     protected static void CopyToClipboard(string content)
     {
         Clipboard.SetText(content);
+    }
+
+    /// <summary>
+    /// Shows an info message for 10 seconds
+    /// </summary>
+    /// <param name="message">The message which should be shown</param>
+    protected void ShowInfoMessage(string message)
+    {
+        InfoMessage = message;
+        _messageTimer.Start();
     }
 }

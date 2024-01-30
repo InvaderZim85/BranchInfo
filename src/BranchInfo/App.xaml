@@ -61,6 +61,12 @@
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.AccentBase}" />
             </Style>
 
+            <Style x:Key="ItemKey" TargetType="{x:Type Label}">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="FontWeight" Value="Bold" />
+            </Style>
+
             <Style BasedOn="{StaticResource MahApps.Styles.Button}" TargetType="{x:Type Button}">
                 <Setter Property="Margin" Value="3" />
             </Style>

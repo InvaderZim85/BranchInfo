@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converter="clr-namespace:BranchInfo.Ui.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:local="clr-namespace:BranchInfo.Ui.View"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -27,6 +28,28 @@
     <Window.Resources>
         <converter:NegateBoolConverter x:Key="NegateBoolConverter" />
     </Window.Resources>
+
+    <mah:MetroWindow.RightWindowCommands>
+        <mah:WindowCommands>
+            <ToggleButton x:Name="ToggleButtonOpenSettings" Content="{iconPacks:Modern Kind=Settings}" />
+        </mah:WindowCommands>
+    </mah:MetroWindow.RightWindowCommands>
+
+    <mah:MetroWindow.Flyouts>
+        <mah:FlyoutsControl>
+            <mah:Flyout
+                MinWidth="350"
+                Background="#FF323232"
+                CloseButtonVisibility="Visible"
+                DataContext="{Binding SettingsControlViewModel}"
+                Header="Settings"
+                IsModal="True"
+                IsOpen="{Binding ElementName=ToggleButtonOpenSettings, Path=IsChecked, Mode=TwoWay}"
+                Position="Right">
+                <local:SettingsControl />
+            </mah:Flyout>
+        </mah:FlyoutsControl>
+    </mah:MetroWindow.Flyouts>
 
     <Grid>
         <Grid.RowDefinitions>

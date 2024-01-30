@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using BranchInfo.Business;
 using Serilog;
 
 namespace BranchInfo;
@@ -20,5 +21,7 @@ public partial class App : Application
         Log.Logger = new LoggerConfiguration()
             .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day, outputTemplate: template)
             .CreateLogger();
+
+        ThemeHelper.SetColorTheme();
     }
 }
