@@ -22,5 +22,7 @@ internal partial class DiffFileWindowViewModel : ViewModelBase
     public void InitViewModel(List<DiffFileEntry> diffFiles)
     {
         DiffFiles = new ObservableCollection<DiffFileEntry>(diffFiles);
+
+        StatusInfo = $"{DiffFiles.Count:N0} files";
     }
 }

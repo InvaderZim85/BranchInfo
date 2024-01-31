@@ -8,8 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:BranchInfo.Ui.ViewModel"
     Title="Diff files"
-    Width="800"
-    Height="450"
+    Width="700"
+    Height="300"
     mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     BorderThickness="1"
@@ -23,38 +23,45 @@
         <viewModel:DiffFileWindowViewModel />
     </Window.DataContext>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <DockPanel LastChildFill="True">
 
-        <DataGrid Grid.Row="0" ItemsSource="{Binding DiffFiles}">
-            <DataGrid.Columns>
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Name}"
-                    Header="File" />
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding FilePath}"
-                    Header="Path" />
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Type}"
-                    Header="Status type" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="{Binding StatusInfo}" />
+        </StatusBar>
 
-        <Separator Grid.Row="1" />
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Button
-            Name="ButtonClose"
-            Grid.Row="2"
-            Width="75"
-            HorizontalAlignment="Right"
-            Click="ButtonClose_OnClick"
-            Content="Close" />
-    </Grid>
+            <DataGrid Grid.Row="0" ItemsSource="{Binding DiffFiles}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Name}"
+                        Header="File" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding FilePath}"
+                        Header="Path" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Type}"
+                        Header="Status type" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Separator Grid.Row="1" />
+
+            <Button
+                Name="ButtonClose"
+                Grid.Row="2"
+                Width="75"
+                HorizontalAlignment="Right"
+                Click="ButtonClose_OnClick"
+                Content="Close" />
+        </Grid>
+    </DockPanel>
 </mah:MetroWindow>

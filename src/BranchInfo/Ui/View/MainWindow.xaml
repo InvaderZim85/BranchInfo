@@ -10,8 +10,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:BranchInfo.Ui.ViewModel"
     Title="{Binding WindowTitle}"
-    Width="800"
-    Height="450"
+    Width="1000"
+    Height="500"
     mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     BorderThickness="1"
@@ -51,120 +51,127 @@
         </mah:FlyoutsControl>
     </mah:MetroWindow.Flyouts>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <DockPanel LastChildFill="True">
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="{Binding StatusInfo}" />
+        </StatusBar>
 
-        <Label
-            Grid.Row="0"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            HorizontalAlignment="Left"
-            Content="{Binding LastCheckInfo}" />
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Separator
-            Grid.Row="1"
-            Grid.Column="0"
-            Grid.ColumnSpan="2" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <DataGrid
-            Grid.Row="2"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            ItemsSource="{Binding BranchList}"
-            SelectedItem="{Binding SelectedBranch}">
-            <DataGrid.Columns>
-                <DataGridTextColumn
-                    Width="*"
-                    MinWidth="100"
-                    Binding="{Binding Repo}"
-                    Header="Repo" />
-                <DataGridTextColumn
-                    Width="200"
-                    Binding="{Binding FriendlyName}"
-                    Header="Branch" />
-                <DataGridTextColumn
-                    Width="200"
-                    Binding="{Binding LastCommit}"
-                    Header="Last commit" />
-                <DataGridTextColumn
-                    Width="180"
-                    Binding="{Binding Status}"
-                    Header="Status" />
-                <DataGridTextColumn
-                    Width="125"
-                    Binding="{Binding LastCheck, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
-                    Header="Last check" />
-                <DataGridTextColumn
-                    Width="*"
-                    MinWidth="100"
-                    Binding="{Binding RepoDirectory}"
-                    Header="Path" />
-            </DataGrid.Columns>
+            <Label
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Left"
+                Content="{Binding LastCheckInfo}" />
 
-            <DataGrid.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Command="{Binding OpenFolderInFileExplorerCommand}" Header="Open folder in file explorer" />
-                    <MenuItem
-                        Command="{Binding ShowDiffFilesCommand}"
-                        Header="Show changes"
-                        IsEnabled="{Binding ContextMenuDiffFilesEnabled}" />
-                </ContextMenu>
-            </DataGrid.ContextMenu>
+            <Separator
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="2" />
 
-        </DataGrid>
+            <DataGrid
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                ItemsSource="{Binding BranchList}"
+                SelectedItem="{Binding SelectedBranch}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="150"
+                        MinWidth="100"
+                        Binding="{Binding Repo}"
+                        Header="Repo" />
+                    <DataGridTextColumn
+                        Width="100"
+                        Binding="{Binding FriendlyName}"
+                        Header="Branch" />
+                    <DataGridTextColumn
+                        Width="200"
+                        Binding="{Binding LastCommit}"
+                        Header="Last commit" />
+                    <DataGridTextColumn
+                        Width="180"
+                        Binding="{Binding Status}"
+                        Header="Status" />
+                    <DataGridTextColumn
+                        Width="125"
+                        Binding="{Binding LastCheck, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
+                        Header="Last check" />
+                    <DataGridTextColumn
+                        Width="2*"
+                        MinWidth="100"
+                        Binding="{Binding RepoDirectory}"
+                        Header="Path" />
+                </DataGrid.Columns>
 
-        <Separator
-            Grid.Row="3"
-            Grid.Column="0"
-            Grid.ColumnSpan="2" />
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Command="{Binding OpenFolderInFileExplorerCommand}" Header="Open folder in file explorer" />
+                        <MenuItem
+                            Command="{Binding ShowDiffFilesCommand}"
+                            Header="Show changes"
+                            IsEnabled="{Binding ContextMenuDiffFilesEnabled}" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
 
-        <StackPanel
-            Grid.Row="4"
-            Grid.Column="0"
-            Orientation="Horizontal">
-            <Button
-                Width="75"
-                Command="{Binding AddBranchCommand}"
-                Content="Add" />
-            <Button
-                Width="75"
-                Command="{Binding EditBranchCommand}"
-                Content="Edit" />
-            <Button
-                Width="75"
-                Command="{Binding RemoveBranchCommand}"
-                Content="Remove" />
-        </StackPanel>
+            </DataGrid>
 
-        <StackPanel
-            Grid.Row="4"
-            Grid.Column="1"
-            HorizontalAlignment="Right"
-            Orientation="Horizontal">
-            <Button
-                Width="75"
-                Margin="3,3,10,3"
-                Command="{Binding LoadBranchInfoCommand}"
-                Content="Refresh" />
-            <CheckBox Content="Auto refresh" IsChecked="{Binding TimerEnabled}" />
-            <mah:NumericUpDown
-                Width="75"
-                Margin="3"
-                IsEnabled="{Binding TimerEnabled, Converter={StaticResource NegateBoolConverter}}"
-                NumericInputMode="Numbers"
-                Value="{Binding CheckTime}" />
-            <Label Content="min." />
-        </StackPanel>
-    </Grid>
+            <Separator
+                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="2" />
+
+            <StackPanel
+                Grid.Row="4"
+                Grid.Column="0"
+                Orientation="Horizontal">
+                <Button
+                    Width="75"
+                    Command="{Binding AddBranchCommand}"
+                    Content="Add" />
+                <Button
+                    Width="75"
+                    Command="{Binding EditBranchCommand}"
+                    Content="Edit" />
+                <Button
+                    Width="75"
+                    Command="{Binding RemoveBranchCommand}"
+                    Content="Remove" />
+            </StackPanel>
+
+            <StackPanel
+                Grid.Row="4"
+                Grid.Column="1"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    Width="75"
+                    Margin="3,3,10,3"
+                    Command="{Binding LoadBranchInfoCommand}"
+                    Content="Refresh" />
+                <CheckBox Content="Auto refresh" IsChecked="{Binding TimerEnabled}" />
+                <mah:NumericUpDown
+                    Width="75"
+                    Margin="3"
+                    IsEnabled="{Binding TimerEnabled, Converter={StaticResource NegateBoolConverter}}"
+                    NumericInputMode="Numbers"
+                    Value="{Binding CheckTime}" />
+                <Label Content="min." />
+            </StackPanel>
+        </Grid>
+    </DockPanel>
 </mah:MetroWindow>

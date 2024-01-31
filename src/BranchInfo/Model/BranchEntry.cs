@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Newtonsoft.Json;
 
 namespace BranchInfo.Model;
 
@@ -71,6 +72,7 @@ public sealed class BranchEntry : ObservableObject
     /// <summary>
     /// Gets or sets the list with the diff files
     /// </summary>
+    [JsonIgnore]
     public List<DiffFileEntry> DiffFiles
     {
         get => _diffFiles;

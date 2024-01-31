@@ -8,6 +8,7 @@ using BranchInfo.Model;
 using BranchInfo.Ui.View;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MahApps.Metro.Controls.Dialogs;
 using Timer = System.Timers.Timer;
 
 namespace BranchInfo.Ui.ViewModel;
@@ -31,6 +32,11 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// Contains the date of the last branch check
     /// </summary>
     private DateTime _lastCheck;
+
+    /// <summary>
+    /// Contains the current version
+    /// </summary>
+    private readonly Version _version = Assembly.GetExecutingAssembly().GetName().Version ?? new();
 
     /// <summary>
     /// Gets or sets the list with the branches
@@ -108,10 +114,10 @@ internal partial class MainWindowViewModel : ViewModelBase
 
             _checkTimer.Elapsed += (_, _) =>
             {
-                LoadBranchInfo();
+                LoadBranchInfo(true);
             };
 
-            LoadBranchInfo();
+            LoadBranchInfo(true);
 
             _checkTimer.Start();
         }
@@ -120,7 +126,7 @@ internal partial class MainWindowViewModel : ViewModelBase
             _checkTimer?.Stop();
             _checkTimer?.Dispose();
 
-            LoadBranchInfo();
+            LoadBranchInfo(true);
         }
     }
 
@@ -129,7 +135,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// </summary>
     public async void InitViewModel()
     {
-        var controller = await ShowProgressAsync("Please wait", "Please wait while adding the branch...");
+        var controller = await ShowProgressAsync("Please wait", "Please wait while loading the data...");
 
         try
         {
@@ -138,13 +144,15 @@ internal partial class MainWindowViewModel : ViewModelBase
 
             _lastCheck = DateTime.Now;
 
-            SetWindowTitle();
-
             SetBranchList();
+
+            SetStatusInfo();
+
+            SetWindowTitle();
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex, ErrorMessageType.Save);
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
         }
         finally
         {
@@ -153,22 +161,48 @@ internal partial class MainWindowViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Loads the branch info
+    /// </summary>
+    /// <param name="catchError"><see langword="true"/> to catch the error (silent), otherwise <see langword="false"/></param>
+    private void LoadBranchInfo(bool catchError)
+    {
+        try
+        {
+            foreach (var branchEntry in BranchList)
+            {
+                BranchManager.LoadBranchInformation(branchEntry);
+            }
+
+            _lastCheck = DateTime.Now;
+
+            SetWindowTitle();
+        }
+        catch (Exception ex)
+        {
+            if (catchError)
+                LogError(ex);
+            else
+                throw;
+        }
+    }
+
+    /// <summary>
     /// Loads the branch information
     /// </summary>
     [RelayCommand]
-    private void LoadBranchInfo()
+    private async Task LoadBranchInfoAsync()
     {
         if (BranchList.Count == 0)
             return;
 
-        foreach (var branchEntry in BranchList)
+        try
         {
-            BranchManager.LoadBranchInformation(branchEntry);
+            LoadBranchInfo(false);
         }
-
-        _lastCheck = DateTime.Now;
-
-        SetWindowTitle();
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex, ErrorMessageType.General);
+        }
     }
 
     /// <summary>
@@ -178,6 +212,8 @@ internal partial class MainWindowViewModel : ViewModelBase
     private void SetBranchList(BranchEntry? preSelection = null)
     {
         BranchList = new ObservableCollection<BranchEntry>(_manager.BranchList);
+
+        SetStatusInfo();
 
         if (preSelection == null)
             return;
@@ -190,12 +226,21 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// </summary>
     private void SetWindowTitle()
     {
-        var version = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
         WindowTitle = TimerEnabled
-            ? $"Branch Info - v{version} [auto refresh]"
-            : $"Branch Info - v{version}";
+            ? $"Branch Info - v{_version} [auto refresh]"
+            : $"Branch Info - v{_version}";
 
         LastCheckInfo = $"Last check: {_lastCheck:yyyy-MM-dd HH:mm:ss}";
+    }
+
+    /// <summary>
+    /// Sets the status info
+    /// </summary>
+    private void SetStatusInfo()
+    {
+        StatusInfo = TimerEnabled
+            ? $"Branch Info - v{_version} [auto refresh] | Last check: {_lastCheck:yyyy-MM-dd HH:mm:ss} | Entries: {BranchList.Count}"
+            : $"Branch Info - v{_version} | Last check: {_lastCheck:yyyy-MM-dd HH:mm:ss} | Entries: {BranchList.Count}";
     }
 
     /// <summary>
@@ -278,6 +323,10 @@ internal partial class MainWindowViewModel : ViewModelBase
     private async Task RemoveBranchAsync()
     {
         if (SelectedBranch == null)
+            return;
+
+        if (await ShowQuestionAsync("Delete", $"Do you really want to delete the '{SelectedBranch.Repo}' entry?") !=
+            MessageDialogResult.Affirmative)
             return;
 
         var controller = await ShowProgressAsync("Please wait", "Please wait while removing the branch...");

@@ -1,8 +1,8 @@
-﻿using BranchInfo.Model;
+﻿using System.Collections;
+using BranchInfo.Model;
 using LibGit2Sharp;
 using Newtonsoft.Json;
 using System.IO;
-using BranchInfo.Common;
 
 namespace BranchInfo.Business;
 
@@ -96,11 +96,12 @@ internal class BranchManager
 
         using var repo = new Repository(branch.GitDirectory);
 
-        var changes = repo.Diff.Compare<TreeChanges>();
         branch.FriendlyName = repo.Head.FriendlyName;
-        branch.DiffFiles = GetDiffFiles(changes);
         branch.LastCheck = DateTime.Now;
-        
+
+        var status = repo.RetrieveStatus(new StatusOptions { IncludeIgnored = false });
+        var diffFiles = GetDiffFiles(status);
+        branch.DiffFiles = diffFiles;
 
         // Get the last commit
         var lastCommit = repo.Commits.FirstOrDefault(); // Get the first entry (the entries are ordered descending)
@@ -110,29 +111,29 @@ internal class BranchManager
     /// <summary>
     /// Gets the diff files
     /// </summary>
-    /// <param name="changes">The changes</param>
+    /// <param name="status">The status</param>
     /// <returns>The list with the diff files</returns>
-    private static List<DiffFileEntry> GetDiffFiles(TreeChanges? changes)
+    private static List<DiffFileEntry> GetDiffFiles(IEnumerable? status)
     {
-        if (changes == null)
+        if (status == null)
             return [];
 
         var result = new List<DiffFileEntry>();
 
-        result.AddRange(GetValues(changes.Added, DiffFileType.Added));
-        result.AddRange(GetValues(changes.Deleted, DiffFileType.Delete));
-        result.AddRange(GetValues(changes.Modified, DiffFileType.Modified));
-        result.AddRange(GetValues(changes.Conflicted, DiffFileType.Conflicted));
-        result.AddRange(GetValues(changes.Copied, DiffFileType.Copied));
-        result.AddRange(GetValues(changes.Renamed, DiffFileType.Renamed));
-        result.AddRange(GetValues(changes.TypeChanged, DiffFileType.TypeChanged));
-        result.AddRange(GetValues(changes.Unmodified, DiffFileType.Unmodified));
+        var properties = typeof(RepositoryStatus).GetProperties();
+
+        foreach (var property in properties)
+        {
+            if (property.PropertyType != typeof(IEnumerable<StatusEntry>))
+                continue;
+
+            var value = property.GetValue(status);
+            if (value is not IEnumerable<StatusEntry> entries)
+                continue;
+
+            result.AddRange(entries.Select(s => new DiffFileEntry(s.FilePath, s.State)));
+        }
 
         return result;
-
-        IEnumerable<DiffFileEntry> GetValues(IEnumerable<TreeEntryChanges> values, DiffFileType type)
-        {
-            return values.Select(s => new DiffFileEntry(s.Path, type));
-        }
     }
 }

@@ -50,6 +50,12 @@ internal partial class ViewModelBase : ObservableObject
     private string _infoMessage = string.Empty;
 
     /// <summary>
+    /// Gets or sets the status info
+    /// </summary>
+    [ObservableProperty]
+    private string _statusInfo = string.Empty;
+
+    /// <summary>
     /// Creates a new instance of the <see cref="ViewModelBase"/>
     /// </summary>
     protected ViewModelBase()
